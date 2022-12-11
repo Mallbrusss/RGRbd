@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	host     = "ip"
+	host     = "localhost"
 	port     = 5432
 	user     = "user"
-	password = "pass"
-	dbname   = "db"
+	password = "password"
+	dbname   = "db name"
 )
 
 func checkError(err error) { // прописываем ошибки
@@ -36,6 +36,89 @@ func openDb() *sql.DB { // open db
 	return db
 }
 
+func show_cluch_dom() { // выводим запись по ключу для таблицы дом
+	var etazhnost int
+	var adres, otop string
+	fmt.Print("Введите адрес:\n")
+	fmt.Fscan(os.Stdin, &adres)
+	rows, err := openDb().Query(`SELECT * from "BdRealtor"."дом" where "адрес"=$1`, &adres)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&adres, &otop, &etazhnost) // сканируем (количество) записи(строки)
+		checkError(err)
+
+		fmt.Println("Этажность дома:", etazhnost, "Индивидуальное отопление: ", otop)
+	}
+	checkError(err)
+}
+
+func show_cluch_kvartira() { // выводим запись по ключу для таблицы квартира
+	var ploshad, etaz, number int
+	fmt.Print("Введите номер квартиры:\n")
+	fmt.Fscan(os.Stdin, &number)
+	rows, err := openDb().Query(`SELECT * from "BdRealtor"."квартира" where "номер"=$1`, &number)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&ploshad, &etaz, &number) // сканируем (количество) записи(строки)
+		checkError(err)
+
+		fmt.Println("Площадь квартиры: ", ploshad, "Этаж квартиры: ", etaz)
+	}
+	checkError(err)
+}
+
+func show_cluch_comp() { // выводим запись по ключу для таблицы дом
+	var name_cp, ur_adres, inN string
+	fmt.Print("Введите ИНН компании:\n")
+	fmt.Fscan(os.Stdin, &inN)
+	rows, err := openDb().Query(`SELECT * from "BdRealtor"."компания_застройщик" where "ИНН"=$1`, &inN)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&name_cp, &ur_adres, &inN) // сканируем (количество) записи(строки)
+		checkError(err)
+
+		fmt.Println("Название компании: ", name_cp, "Юр.адрес компании: ", ur_adres)
+	}
+	checkError(err)
+}
+
+func show_cluch_oble() { // выводим запись по ключу для таблицы дом
+	var nomObl int
+	var mebel, dateObl string
+	fmt.Print("Введите номер объявления:\n")
+	fmt.Fscan(os.Stdin, &nomObl)
+	rows, err := openDb().Query(`SELECT * from "BdRealtor"."объявление" where "номер_объявления"=$1`, &nomObl)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&mebel, &dateObl, &nomObl) // сканируем (количество) записи(строки)
+		checkError(err)
+
+		fmt.Println("Дата объявления: ", dateObl, "Наличие мебели: ", mebel)
+	}
+	checkError(err)
+}
+
+func show_cluch_prod() { // выводим запись по ключу для таблицы дом
+	var pasport int
+	var fio, telefon, eMail string
+	fmt.Print("Введите номер паспорта:\n")
+	fmt.Fscan(os.Stdin, &pasport)
+	rows, err := openDb().Query(`SELECT * from "BdRealtor"."продавец" where "с-н_паспорта"=$1`, &pasport)
+	checkError(err)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&pasport, &fio, &telefon, &eMail) // сканируем (количество) записи(строки)
+		checkError(err)
+
+		fmt.Println("ФИО продавца: ", fio, "Телефон продавца: ", telefon, "Почта продавца: ", eMail)
+	}
+	checkError(err)
+}
+
 func show_table_dom() { // показываем таблицу дом
 	rows, err := openDb().Query(`SELECT "этажность", "адрес", "индивидуальное_отопление" FROM "BdRealtor"."дом"`)
 	checkError(err)
@@ -48,7 +131,7 @@ func show_table_dom() { // показываем таблицу дом
 		err = rows.Scan(&etazhnost, &adres, &otop)
 		checkError(err)
 
-		fmt.Println(etazhnost, adres, otop)
+		fmt.Println("Адрес дома: ", adres, "Этажность дома: ", etazhnost, " Есть ли отопление: ", otop)
 	}
 
 	checkError(err)
@@ -65,7 +148,7 @@ func show_table_kvartira() { // показываем таблицу кварти
 		err = rows.Scan(&ploshad, &etaz, &number)
 		checkError(err)
 
-		fmt.Println(ploshad, etaz, number)
+		fmt.Println("Номер квартиры:", number, "Площадь квартиры: ", ploshad, "Этаж квартиры: ", etaz)
 	}
 
 	checkError(err)
@@ -83,7 +166,7 @@ func show_table_comp() { // показываем таблицу компания
 		err = rows.Scan(&name_cp, &ur_adres, &inN)
 		checkError(err)
 
-		fmt.Println(name_cp, ur_adres, inN)
+		fmt.Println("ИНН компании", inN, "Название компании", name_cp, "Юр.адрес компании", ur_adres)
 	}
 
 	checkError(err)
@@ -101,7 +184,7 @@ func show_table_obl() { // показываем таблицу объявлен�
 		err = rows.Scan(&mebel, &dateObl, &nomObl)
 		checkError(err)
 
-		fmt.Println(mebel, dateObl, nomObl)
+		fmt.Println("Номер объявления: ", nomObl, "Дата объявления: ", dateObl, "Есть ли мебель? : ", mebel)
 	}
 
 	checkError(err)
@@ -119,7 +202,7 @@ func show_table_prod() { // показываем таблицу продавец
 		err = rows.Scan(&pasport, &fio, &telefon, &eMail)
 		checkError(err)
 
-		fmt.Println(pasport, fio, telefon, eMail)
+		fmt.Println("номер паспорта продавца: ", pasport, "ФИО продавца: ", fio, "Номер телефона продавца:", telefon, "Почта продавца: ", eMail)
 	}
 
 	checkError(err)
@@ -433,6 +516,25 @@ func show_switch_case() { // функция выбора таблицы для �
 	}
 }
 
+func show_klutch_switch_case() {
+	var vibor string
+	fmt.Print("выберите дейсвтие: showCluchDom -  чтобы показать данные из таблицы дом\n showCluchKvartira - показать данные из таблицы квартира\n showCluchCompany показать данные из таблицы компания\n showCluchOble - показать данные из таблицы объявление\n showCluchProd - показать данные из таблицы продавец\n")
+	fmt.Scanf("%s\n", &vibor)
+
+	switch vibor {
+	case "showCluchDom":
+		show_cluch_dom()
+	case "showCluchKvartira":
+		show_cluch_kvartira()
+	case "showCluchCompany":
+		show_cluch_comp()
+	case "showCluchOble":
+		show_cluch_oble()
+	case "showCluchProd":
+		show_cluch_prod()
+	}
+}
+
 func main() {
 	var v1 string
 	//close db
@@ -441,7 +543,7 @@ func main() {
 	err := openDb().Ping()
 	checkError(err)
 
-	fmt.Print("Что вы хотите сделать?\n Чтобы добавить значения в таблицу введите addTable\n Чтобы обновить запись введите updateTable\n Чтобы удалить запись из таблицы введите deleteFromTable\n Чтобы показать данные в таблице введите showTable\n ")
+	fmt.Print("Что вы хотите сделать?\n Чтобы добавить значения в таблицу введите addTable\n Чтобы обновить запись введите updateTable\n Чтобы удалить запись из таблицы введите deleteFromTable\n Чтобы показать данные в таблице введите showTable\n Чтобы показать запись по ключу введите showKluch\n")
 	fmt.Scanf("%s\n", &v1)
 
 	switch v1 {
@@ -453,5 +555,7 @@ func main() {
 		delete_switch_case()
 	case "showTable":
 		show_switch_case()
+	case "showKluch":
+		show_klutch_switch_case()
 	}
 }
